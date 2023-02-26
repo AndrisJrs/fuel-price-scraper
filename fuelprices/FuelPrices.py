@@ -10,7 +10,7 @@ class FuelPrices:
     self.fuel_98_price = fuel_98_price
     self.fuel_diesel_price = fuel_diesel_price
     self.fuel_lpg_price = fuel_lpg_price
-    self.timestamp = time.time()
+    self.timestamp = datetime.now(timezone.utc)
 
   def get_fuel_prices(station_name, url, fuel_95_css_selector, fuel_98_css_selector, fuel_diesel_css_selector, fuel_lpg_css_selector):
     float_regex = r"\d+(?:\.\d+)?"
