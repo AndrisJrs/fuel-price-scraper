@@ -29,6 +29,6 @@ jobs:
         context: .
         push: true
         tags: |
-          ghcr.io/${{ github.repository }}:${{ github.ref_name }}
-          ghcr.io/${{ github.repository }}:latest
+          ghcr.io/${{ github.repository | tolower }}:${{ github.ref_name }}
+          ghcr.io/${{ github.repository | tolower }}:latest
         dockerfile: Dockerfile
