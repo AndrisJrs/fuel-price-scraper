@@ -4,6 +4,10 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-22.04
@@ -25,7 +29,6 @@ jobs:
         context: .
         push: true
         tags: |
-          ghcr.io/AndrisJrs/fuel-price-tracker:${{ vars.GITHUB_REF_NAME }}
-          ghcr.io/AndrisJrs/fuel-price-tracker:latest
+          ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          ghcr.io/${{ github.repository }}:latest
         dockerfile: Dockerfile
-
