@@ -9,3 +9,5 @@ venv.bak/
 
 Dockerfile
 README.md
+.gitignore
+.github
