@@ -1,4 +1,4 @@
-# Fuel Price Tracker
+# Fuel Price Scraper
 
 ## Abstract
 
@@ -22,6 +22,6 @@ In addition log level can be configured using following environment variable
 Dockerfile is provided to run this script in a portable fashion with all dependencies configured. Docker image are also provided in this repository. \
 Docker build and run example:
 
-    docker build -t fuel-price-tracker .
+    docker build -t fuel-price-scraper .
 
-    docker run -e LOG_LEVEL="DEBUG" -e INFLUXDB_BUCKET="fuel_prices" -e INFLUXDB_URL="http://infuxdb:8086" -e INFLUXDB_ORG="primary" -e INFLUXDB_TOKEN="token" --name fuel-price-tracker fuel-price-tracker
+    docker run -e LOG_LEVEL="DEBUG" -e INFLUXDB_BUCKET="fuel_prices" -e INFLUXDB_URL="http://infuxdb:8086" -e INFLUXDB_ORG="primary" -e INFLUXDB_TOKEN="token" --name fuel-price-scraper fuel-price-scraper
