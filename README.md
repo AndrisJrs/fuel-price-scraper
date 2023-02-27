@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This is scraper written in Python 3.10 that collects data from most popular fuel stations in Latvia and writes them into InfluxDB time series database that can later be used to visualize data in Graphana or other tools. This script must be configured with CRON to retrieve data in automated and repeated manner.
+This is scraper written in Python 3.10 that collects data from most popular fuel stations in Latvia - CircleK, Neste, Virši and writes them into InfluxDB time series database that can later be used to visualize data in Graphana or other tools. This script must be configured with CRON to retrieve data in automated and repeated manner.
 
 ## Configuration
 
