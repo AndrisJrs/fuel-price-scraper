@@ -8,7 +8,7 @@ class GasStations:
         fuel_95_css_selector = '.ck-striped-table > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(2)'
         fuel_98_css_selector = '.ck-striped-table > tbody:nth-child(2) > tr:nth-child(2) > td:nth-child(2)'
         fuel_diesel_css_selector = '.ck-striped-table > tbody:nth-child(2) > tr:nth-child(3) > td:nth-child(2)'
-        fuel_lpg_css_selector = '.ck-striped-table > tbody:nth-child(2) > tr:nth-child(4) > td:nth-child(2)'
+        fuel_lpg_css_selector = '.ck-striped-table > tbody:nth-child(2) > tr:nth-child(5) > td:nth-child(2)'
         logging.info("Retrieving fuel prices for " + station_name)
         return FuelPrices.get_fuel_prices(station_name, url, fuel_95_css_selector, fuel_98_css_selector, fuel_diesel_css_selector, fuel_lpg_css_selector)
 
@@ -18,9 +18,8 @@ class GasStations:
         fuel_95_css_selector = '.field__item > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
         fuel_98_css_selector = '.field__item > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
         fuel_diesel_css_selector = '.field__item > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
-        fuel_lpg_css_selector = None
         logging.info("Retrieving fuel prices for " + station_name)
-        return FuelPrices.get_fuel_prices(station_name, url, fuel_95_css_selector, fuel_98_css_selector, fuel_diesel_css_selector, fuel_lpg_css_selector)
+        return FuelPrices.get_fuel_prices(station_name, url, fuel_95_css_selector, fuel_98_css_selector, fuel_diesel_css_selector, None)
 
     def get_virsi_prices():
         station_name = "Virši"
