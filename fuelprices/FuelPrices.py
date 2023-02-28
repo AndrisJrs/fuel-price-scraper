@@ -22,8 +22,8 @@ class FuelPrices:
       prices['fuel_95_price'] = float(re.findall(float_regex, fuel_95_price_object)[0])
      
     if fuel_98_css_selector is not None:
-      fuel_95_price_object = soup.select(fuel_95_css_selector)[0].text
-      prices['fuel_98_price'] = float(re.findall(float_regex, fuel_98_css_selector)[0])
+      fuel_98_price_object = soup.select(fuel_98_css_selector)[0].text
+      prices['fuel_98_price'] = float(re.findall(float_regex, fuel_98_price_object)[0])
 
     if fuel_diesel_css_selector is not None:
       fuel_diesel_price_object = soup.select(fuel_diesel_css_selector)[0].text
