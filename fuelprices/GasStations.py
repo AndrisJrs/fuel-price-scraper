@@ -15,9 +15,9 @@ class GasStations:
     def get_neste_prices():
         station_name = "Neste"
         url = "https://www.neste.lv/lv/content/degvielas-cenas"
-        fuel_95_css_selector = '.field__item > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) > p:nth-child(1) > strong:nth-child(1)'
-        fuel_98_css_selector = '.field__item > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2) > p:nth-child(1) > strong:nth-child(1)'
-        fuel_diesel_css_selector = '.field__item > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2) > p:nth-child(1) > strong:nth-child(1)'
+        fuel_95_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
+        fuel_98_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
+        fuel_diesel_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
         logging.info("Retrieving fuel prices for " + station_name)
         return FuelPrices.get_fuel_prices(station_name, url, fuel_95_css_selector, fuel_98_css_selector, fuel_diesel_css_selector, None)
 
