@@ -11,8 +11,7 @@ class InfluxDb:
         self.write_api = client.write_api(write_options=SYNCHRONOUS)
 
     def write_fuel_prices(self, fuel_prices):
-        logging.info("Writing prices into InfluxDB for " + fuel_prices.fuel_station_name)
-        for fuel in fuel_prices.prices:
-            logging.debug("Writing " + fuel + " price into InfluxDB" + " for " + fuel_prices.fuel_station_name)
-            record = influxdb_client.Point(fuel).tag("fuel_station", fuel_prices.fuel_station_name).time(fuel_prices.timestamp).field("price", fuel_prices.prices[fuel])
+        for fuel_price in fuel_prices:
+            logging.info("Writing fuel" + fuel_price.fuel_key + " with price " + str(fuel_price.price) + " into InfluxDB for " + fuel_price.fuel_station_name)
+            record = influxdb_client.Point(fuel_price.fuel_key).tag("fuel_station", fuel_price.fuel_station_name).time(fuel_price.timestamp).field("price", fuel_price.price).field("location", fuel_price.location)
             self.write_api.write(bucket=self.bucket, org=self.organization, record=record)

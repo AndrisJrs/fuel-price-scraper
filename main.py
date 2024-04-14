@@ -1,7 +1,7 @@
 import os
 import logging
 from fuelprices.GasStations import GasStations
-from fuelprices.InfluxDbHelper import InfluxDb
+from fuelprices.InfluxDb import InfluxDb
 
 def main():
     bucket = os.environ['INFLUXDB_BUCKET']
