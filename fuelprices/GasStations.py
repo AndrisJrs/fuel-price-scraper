@@ -107,14 +107,14 @@ class GasStations:
     def get_viada_prices() -> list:
         station_name = "Viada"
         url = "https://www.viada.lv/zemakas-degvielas-cenas/"
-        fuel_95_price_css_selector = '.the_content_wrapper > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2)'
-        fuel_95_location_css_selector = '.the_content_wrapper > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3)'
-        fuel_98_price_css_selector = '.the_content_wrapper > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2)'
-        fuel_98_location_css_selector = '.the_content_wrapper > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3)'
-        fuel_diesel_price_css_selector = '.the_content_wrapper > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(5) > td:nth-child(2)'
-        fuel_diesel_location_css_selector = '.the_content_wrapper > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(5) > td:nth-child(3)'
-        fuel_lpg_price_css_selector = '.the_content_wrapper > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(2)'
-        fuel_lpg_location_css_selector = '.the_content_wrapper > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(3)'
+        fuel_95_price_css_selector = '.the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2)'
+        fuel_95_location_css_selector = '.the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3)'
+        fuel_98_price_css_selector = '.the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2)'
+        fuel_98_location_css_selector = '.the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3)'
+        fuel_diesel_price_css_selector = '.the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(5) > td:nth-child(2)'
+        fuel_diesel_location_css_selector = '.the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(5) > td:nth-child(3)'
+        fuel_lpg_price_css_selector = '.the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(2)'
+        fuel_lpg_location_css_selector = '.the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(3)'
 
         logging.info("Retrieving fuel prices for " + station_name)
 
