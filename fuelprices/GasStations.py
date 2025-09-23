@@ -29,8 +29,8 @@ class GasStations:
         fuel_98_location_css_selector = '.uk-table > tbody:nth-child(2) > tr:nth-child(2) > td:nth-child(3)'
         fuel_diesel_price_css_selector = '.uk-table > tbody:nth-child(2) > tr:nth-child(3) > td:nth-child(2)'
         fuel_diesel_location_css_selector = '.uk-table > tbody:nth-child(2) > tr:nth-child(3) > td:nth-child(3)'
-        fuel_lpg_price_css_selector = '.uk-table > tbody:nth-child(2) > tr:nth-child(5) > td:nth-child(2)'
-        fuel_lpg_location_css_selector = '.uk-table > tbody:nth-child(2) > tr:nth-child(5) > td:nth-child(3)'
+        fuel_lpg_price_css_selector = '.uk-table > tbody:nth-child(2) > tr:nth-child(6) > td:nth-child(2)'
+        fuel_lpg_location_css_selector = '.uk-table > tbody:nth-child(2) > tr:nth-child(6) > td:nth-child(3)'
         logging.info("Retrieving fuel prices for " + station_name)
 
         logging.debug("Getting URL " + url)
