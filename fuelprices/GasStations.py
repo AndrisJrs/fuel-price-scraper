@@ -128,7 +128,7 @@ class GasStations:
         logging.info("Retrieving fuel prices for " + station_name)
 
         logging.debug("Getting URL " + url)
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
 
         fuel_prices = []
 
