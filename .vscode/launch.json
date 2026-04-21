@@ -5,18 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
-            "type": "python",
+            "name": "Python: Fuel Price Scraper",
+            "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "program": "${workspaceFolder}/main.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "env": {
-                "INFLUXDB_BUCKET": "",
-                "INFLUXDB_URL": "",
-                "INFLUXDB_ORG": "",
-                "INFLUXDB_TOKEN": ""
-            }
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
