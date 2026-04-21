@@ -59,11 +59,11 @@ class GasStations:
         station_name = "Neste"
         url = "https://www.neste.lv/lv/content/degvielas-cenas"
         fuel_95_price_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
-        fuel_95_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)'
+        fuel_95_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3) > p:nth-child(1) > font:nth-child(1)'
         fuel_98_price_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
-        fuel_98_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(3) > span:nth-child(1)'
+        fuel_98_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(3) > font:nth-child(1)'
         fuel_diesel_price_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
-        fuel_diesel_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3) > span:nth-child(1)'
+        fuel_diesel_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3) > font:nth-child(2)'
         fuel_renewable_diesel_price_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(2) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
         fuel_renewable_diesel_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)'
         logging.info("Retrieving fuel prices for " + station_name)
@@ -128,7 +128,7 @@ class GasStations:
         logging.info("Retrieving fuel prices for " + station_name)
 
         logging.debug("Getting URL " + url)
-        response = requests.get(url, verify=False)
+        response = requests.get(url)
 
         fuel_prices = []
 
