@@ -69,7 +69,6 @@ def get_neste_prices() -> list[FuelPrice]:
         ),
         diesel_location_css_selector=(
             ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3)"
-            ".table > tbody:nth-child(2) > tr:nth-child(3) > td:nth-child(3)"
         ),
         renewable_diesel_price_css_selector=(
             ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(2) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)"
