@@ -194,7 +194,7 @@ def __get_station_prices(station_parameters: StationParameters) -> list[FuelPric
             logging.error(
                 f"Failed to retrieve {FuelType.PETROL_95} price for {station_parameters.station_name} station"
             )
-            logging.error(e)
+            logging.exception(e)
 
     if (
         station_parameters.petrol_98_price_css_selector
@@ -216,7 +216,7 @@ def __get_station_prices(station_parameters: StationParameters) -> list[FuelPric
             logging.error(
                 f"Failed to retrieve {FuelType.PETROL_98} price for {station_parameters.station_name} station"
             )
-            logging.error(e)
+            logging.exception(e)
 
     if (
         station_parameters.diesel_price_css_selector
@@ -238,7 +238,7 @@ def __get_station_prices(station_parameters: StationParameters) -> list[FuelPric
             logging.error(
                 f"Failed to retrieve {FuelType.DIESEL} price for {station_parameters.station_name} station"
             )
-            logging.error(e)
+            logging.exception(e)
 
     if (
         station_parameters.renewable_diesel_price_css_selector
@@ -260,7 +260,7 @@ def __get_station_prices(station_parameters: StationParameters) -> list[FuelPric
             logging.error(
                 f"Failed to retrieve {FuelType.RENEWABLE_DIESEL} price for {station_parameters.station_name} station"
             )
-            logging.error(e)
+            logging.exception(e)
 
     if (
         station_parameters.lpg_price_css_selector
@@ -282,5 +282,5 @@ def __get_station_prices(station_parameters: StationParameters) -> list[FuelPric
             logging.error(
                 f"Failed to retrieve {FuelType.LPG} price for {station_parameters.station_name} station"
             )
-            logging.error(e)
+            logging.exception(e)
     return fuel_prices
