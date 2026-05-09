@@ -197,7 +197,7 @@ def __get_station_prices(station_parameters: StationParameters) -> list[FuelPric
 
     if (
         station_parameters.petrol_98_price_css_selector
-        and station_parameters.petrol_98_price_css_selector
+        and station_parameters.petrol_98_location_css_selector
     ):
         try:
             logging.debug(
@@ -207,7 +207,7 @@ def __get_station_prices(station_parameters: StationParameters) -> list[FuelPric
                 response_text=response.text,
                 station_name=station_parameters.station_name,
                 fuel_css_selector=station_parameters.petrol_98_price_css_selector,
-                fuel_location_css_selector=station_parameters.petrol_98_price_css_selector,
+                fuel_location_css_selector=station_parameters.petrol_98_location_css_selector,
                 fuel_key=FuelType.PETROL_98,
             )
             fuel_prices.append(fuel_price)
