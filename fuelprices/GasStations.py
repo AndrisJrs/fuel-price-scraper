@@ -15,9 +15,9 @@ class GasStations:
         logging.debug("Parsing " + fuel_key + " for " + station_name)
         soup = BeautifulSoup(response_text, 'html.parser')
         float_regex = r"\d+(?:\.\d+)?"
-        price_string = soup.select(fuel_css_selector)[0].text
+        price_string = soup.select_one(fuel_css_selector).text
         price_float = float(re.findall(float_regex, price_string)[0])
-        location = soup.select(fuel_location_css_selector)[0].text
+        location = soup.select_one(fuel_location_css_selector).text
 
         return FuelPrice(station_name, fuel_key, price_float, location)
 
@@ -59,11 +59,11 @@ class GasStations:
         station_name = "Neste"
         url = "https://www.neste.lv/lv/content/degvielas-cenas"
         fuel_95_price_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
-        fuel_95_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3) > p:nth-child(1)'
+        fuel_95_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3) > p:nth-child(2)'
         fuel_98_price_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
         fuel_98_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(3)'
-        fuel_diesel_price_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2) > p:nth-child(1) > font:nth-child(1) > span:nth-child(1) > b:nth-child(1)'
-        fuel_diesel_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3)'
+        fuel_diesel_price_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(5) > td:nth-child(2) > p:nth-child(1) > font:nth-child(1) > span:nth-child(1) > b:nth-child(1)'
+        fuel_diesel_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(5) > td:nth-child(3)'
         fuel_renewable_diesel_price_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(2) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)'
         fuel_renewable_diesel_location_css_selector = '.field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)'
         logging.info("Retrieving fuel prices for " + station_name)
