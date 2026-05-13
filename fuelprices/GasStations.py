@@ -13,34 +13,34 @@ def get_circlek_prices() -> list[FuelPrice]:
         station_name="CircleK",
         url="https://www.circlek.lv/degviela-miles/degvielas-cenas",
         petrol_95_price_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(2)"
+            ".table > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1)"
         ),
         petrol_95_location_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(3)"
+            ".table > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)"
         ),
         petrol_98_price_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(2) > td:nth-child(2)"
+            ".table > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1)"
         ),
         petrol_98_location_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(2) > td:nth-child(3)"
+            ".table > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)"
         ),
         diesel_price_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(3) > td:nth-child(2)"
+            ".table > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1)"
         ),
         diesel_location_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(3) > td:nth-child(3)"
+            ".table > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)"
         ),
         renewable_diesel_price_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(5) > td:nth-child(2)"
+            ".table > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(2) > p:nth-child(1)"
         ),
         renewable_diesel_location_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(5) > td:nth-child(3)"
+            ".table > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(3) > p:nth-child(1)"
         ),
         lpg_price_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(6) > td:nth-child(2)"
+            ".table > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1)"
         ),
         lpg_location_css_selector=(
-            ".table > tbody:nth-child(2) > tr:nth-child(6) > td:nth-child(3)"
+            ".table > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(3) > p:nth-child(1)"
         ),
     )
 
