@@ -2,3 +2,5 @@ beautifulsoup4==4.14.3
 influxdb-client==1.50.0
 requests==2.33.1
 ruff==0.15.12
+pandas==3.0.3
+lxml==6.1.0

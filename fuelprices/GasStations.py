@@ -1,84 +1,87 @@
 import requests
 import re
 import logging
+import pandas as pd
 from fuelprices.FuelPrice import FuelPrice
 from bs4 import BeautifulSoup
 
 from fuelprices.FuelType import FuelType
 from fuelprices.StationParameters import StationParameters
 
+price_regex = r"\d+(?:\.\d+)?"
 
 def get_circlek_prices() -> list[FuelPrice]:
-    cirlek_parameters = StationParameters(
-        station_name="CircleK",
-        url="https://www.circlek.lv/degviela-miles/degvielas-cenas",
-        petrol_95_price_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1)"
-        ),
-        petrol_95_location_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)"
-        ),
-        petrol_98_price_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1)"
-        ),
-        petrol_98_location_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)"
-        ),
-        diesel_price_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1)"
-        ),
-        diesel_location_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)"
-        ),
-        renewable_diesel_price_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(2) > p:nth-child(1)"
-        ),
-        renewable_diesel_location_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(3) > p:nth-child(1)"
-        ),
-        lpg_price_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1)"
-        ),
-        lpg_location_css_selector=(
-            ".table > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(3) > p:nth-child(1)"
-        ),
-    )
+    station_name = "CircleK"
+    url = "https://www.circlek.lv/degviela-miles/degvielas-cenas"
+    fuel_prices = []
 
-    fuel_prices = __get_station_prices(station_parameters=cirlek_parameters)
+    tables = pd.read_html(url)
+
+    df = tables[0]
+    df = df.iloc[1:].reset_index(drop=True)
+    df.columns = ["fuel_type", "price", "location"]
+
+    fuel_mapping = {
+        "95miles": FuelType.PETROL_95,
+        "98miles+": FuelType.PETROL_98,
+        "Dmiles": FuelType.DIESEL,
+        "miles+\xa0XTL": FuelType.RENEWABLE_DIESEL,
+        "Dmiles+": FuelType.PRO_DIESEL,
+        "Autogāze": FuelType.LPG,
+    }
+
+    df["fuel_enum"] = df["fuel_type"].map(fuel_mapping)
+
+    for index, row in df.iterrows():
+        logging.debug(f"Processing row: {row["fuel_type"]}, {row["price"]}, {row["location"]}")
+        if pd.isna(row["fuel_enum"]):
+            logging.debug(f"Skipping unknown fuel type: {row["fuel_type"]}")
+            continue
+        fuel_price = FuelPrice(
+            fuel_station_name=station_name,
+            fuel_key=row["fuel_enum"],
+            price=float(re.findall(price_regex, row["price"])[0]),
+            location=row["location"]
+        )
+        fuel_prices.append(fuel_price)
+
     return fuel_prices
 
 
 def get_neste_prices() -> list[FuelPrice]:
-    neste_parameters = StationParameters(
-        station_name="Neste",
-        url="https://www.neste.lv/lv/content/degvielas-cenas",
-        petrol_95_price_css_selector=(
-            ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)"
-        ),
-        petrol_95_location_css_selector=(
-            ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3) > p:nth-child(2)"
-        ),
-        petrol_98_price_css_selector=(
-            ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)"
-        ),
-        petrol_98_location_css_selector=(
-            ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(3)"
-        ),
-        diesel_price_css_selector=(
-            ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2) > p:nth-child(1) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)"
-        ),
-        diesel_location_css_selector=(
-            ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3)"
-        ),
-        renewable_diesel_price_css_selector=(
-            ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(2) > span:nth-child(1) > span:nth-child(1) > strong:nth-child(1)"
-        ),
-        renewable_diesel_location_css_selector=(
-            ".field__item > table:nth-child(4) > tbody:nth-child(1) > tr:nth-child(6) > td:nth-child(3) > p:nth-child(1) > span:nth-child(1)"
-        ),
-    )
+    station_name = "Neste"
+    url = "https://www.neste.lv/lv/content/degvielas-cenas"
+    fuel_prices = []
 
-    fuel_prices = __get_station_prices(station_parameters=neste_parameters)
+    tables = pd.read_html(url)
+
+    df = tables[0]
+    df = df.iloc[1:].reset_index(drop=True)
+    df.columns = ["fuel_type", "price", "location"]
+
+    fuel_mapping = {
+        "Neste Futura\xa095": FuelType.PETROL_95,
+        "Neste Futura 98": FuelType.PETROL_98,
+        "Neste Futura D": FuelType.DIESEL,
+        "Neste Pro Diesel": FuelType.RENEWABLE_DIESEL,
+        "Neste MY Renewable Diesel": FuelType.PRO_DIESEL
+    }
+
+    df["fuel_enum"] = df["fuel_type"].map(fuel_mapping)
+
+    for index, row in df.iterrows():
+        logging.debug(f"Processing row: {row["fuel_type"]}, {row["price"]}, {row["location"]}")
+        if pd.isna(row["fuel_enum"]):
+            logging.debug(f"Skipping unknown fuel type: {row["fuel_type"]}")
+            continue
+        fuel_price = FuelPrice(
+            fuel_station_name=station_name,
+            fuel_key=row["fuel_enum"],
+            price=float(re.findall(price_regex, row["price"])[0]),
+            location=row["location"]
+        )
+        fuel_prices.append(fuel_price)
+
     return fuel_prices
 
 
