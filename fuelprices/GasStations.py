@@ -88,16 +88,16 @@ def get_virsi_prices() -> list[FuelPrice]:
         station_name="Virši",
         url="https://www.virsi.lv/lv/privatpersonam/degviela/degvielas-un-elektrouzlades-cenas",
         petrol_95_price_css_selector=(
-            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
-        ),
-        petrol_95_location_css_selector=(
-            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(2) > p:nth-child(2)"
-        ),
-        petrol_98_price_css_selector=(
             "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(3) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
         ),
-        petrol_98_location_css_selector=(
+        petrol_95_location_css_selector=(
             "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(3) > p:nth-child(2)"
+        ),
+        petrol_98_price_css_selector=(
+            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(4) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
+        ),
+        petrol_98_location_css_selector=(
+            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(4) > p:nth-child(2)"
         ),
         diesel_price_css_selector=(
             "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
@@ -106,9 +106,9 @@ def get_virsi_prices() -> list[FuelPrice]:
             "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(1) > p:nth-child(2)"
         ),
         lpg_price_css_selector=(
-            "div.price-card:nth-child(5) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
+            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
         ),
-        lpg_location_css_selector=("div.price-card:nth-child(5) > p:nth-child(2)"),
+        lpg_location_css_selector=("div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(6) > p:nth-child(2)"),
     )
 
     fuel_prices = __get_station_prices(station_parameters=virsi_parameters)
