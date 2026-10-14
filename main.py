@@ -25,13 +25,6 @@ def main():
         logging.exception(e)
 
     try:
-        neste_prices = get_neste_prices()
-        influxdb.write_fuel_prices(neste_prices)
-    except Exception as e:
-        logging.error("Failed to retrieve Neste prices")
-        logging.exception(e)
-
-    try:
         virsi_prices = get_virsi_prices()
         influxdb.write_fuel_prices(virsi_prices)
     except Exception as e:
