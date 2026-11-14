@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 
 
 class FuelPrice:
@@ -7,4 +7,4 @@ class FuelPrice:
         self.fuel_key = fuel_key
         self.price = price
         self.location = location
-        self.timestamp = datetime.now(timezone.utc)
+        self.timestamp = datetime.now(UTC)

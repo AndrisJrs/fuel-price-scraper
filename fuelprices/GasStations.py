@@ -1,250 +1,161 @@
 import requests
 import re
+from io import StringIO
 import logging
 import pandas as pd
 from fuelprices.FuelPrice import FuelPrice
 from bs4 import BeautifulSoup
 
 from fuelprices.FuelType import FuelType
-from fuelprices.StationParameters import StationParameters
 
 price_regex = r"\d+(?:\.\d+)?"
 
-def get_circlek_prices() -> list[FuelPrice]:
-    station_name = "CircleK"
-    url = "https://www.circlek.lv/degviela-miles/degvielas-cenas"
-    fuel_prices = []
 
-    tables = pd.read_html(url, skiprows=1)
+def _normalize_whitespace(text) -> str:
+    return " ".join(str(text).split())
 
-    df = tables[0]
-    df.columns = ["fuel_type", "price", "location"]
 
-    fuel_mapping = {
-        "95miles": FuelType.PETROL_95,
-        "98miles+": FuelType.PETROL_98,
-        "Dmiles": FuelType.DIESEL,
-        "miles+\xa0XTL": FuelType.RENEWABLE_DIESEL,
-        "Dmiles+": FuelType.PRO_DIESEL,
-        "Autogāze": FuelType.LPG,
-    }
+def _parse_fuel_rows(
+    df: pd.DataFrame, station_name: str, fuel_mapping: dict[str, FuelType]
+) -> list[FuelPrice]:
+    """Turn a DataFrame with fuel_type, price and location columns into FuelPrices.
 
+    Rows whose fuel_type isn't in fuel_mapping, or whose price can't be parsed,
+    are logged and skipped.
+    """
+    if df.empty:
+        raise ValueError(
+            f"No fuel rows found on {station_name} page; layout may have changed"
+        )
+
+    df = df[["fuel_type", "price", "location"]].fillna("")
+    df = df.map(_normalize_whitespace)
     df["fuel_enum"] = df["fuel_type"].map(fuel_mapping)
 
-    for index, row in df.iterrows():
-        logging.debug(f"Processing row: {row["fuel_type"]}, {row["price"]}, {row["location"]}")
-        if pd.isna(row["fuel_enum"]):
-            logging.debug(f"Skipping unknown fuel type: {row["fuel_type"]}")
+    fuel_prices = []
+    for row in df.itertuples(index=False):
+        logging.debug(f"Processing row: {row.fuel_type}, {row.price}, {row.location}")
+        if pd.isna(row.fuel_enum):
+            logging.debug(f"Skipping unknown fuel type: {row.fuel_type}")
             continue
-        fuel_price = FuelPrice(
-            fuel_station_name=station_name,
-            fuel_key=row["fuel_enum"],
-            price=float(re.findall(price_regex, str(row["price"]))[0]),
-            location=row["location"]
+        prices = re.findall(price_regex, row.price.replace(",", "."))
+        if not prices:
+            logging.error(
+                f"No price found for {station_name} {row.fuel_type}: {row.price!r}"
+            )
+            continue
+        fuel_prices.append(
+            FuelPrice(
+                fuel_station_name=station_name,
+                fuel_key=row.fuel_enum,
+                price=float(prices[0]),
+                location=row.location,
+            )
         )
-        fuel_prices.append(fuel_price)
 
     return fuel_prices
+
+
+def get_circlek_prices() -> list[FuelPrice]:
+    url = "https://www.circlek.lv/degviela-miles/degvielas-cenas"
+
+    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+    response.raise_for_status()
+    return parse_circlek_prices(response.text)
+
+
+def parse_circlek_prices(html: str) -> list[FuelPrice]:
+    tables = pd.read_html(StringIO(html), match="Degviela", skiprows=1)
+
+    df = tables[0].iloc[:, :3]
+    df.columns = ["fuel_type", "price", "location"]
+
+    return _parse_fuel_rows(
+        df,
+        station_name="CircleK",
+        fuel_mapping={
+            "95miles": FuelType.PETROL_95,
+            "98miles+": FuelType.PETROL_98,
+            "Dmiles": FuelType.DIESEL,
+            "miles+ XTL": FuelType.RENEWABLE_DIESEL,
+            "Dmiles+": FuelType.PRO_DIESEL,
+            "Autogāze": FuelType.LPG,
+        },
+    )
 
 
 def get_virsi_prices() -> list[FuelPrice]:
-    virsi_parameters = StationParameters(
-        station_name="Virši",
-        url="https://www.virsi.lv/lv/privatpersonam/degviela/degvielas-un-elektrouzlades-cenas",
-        petrol_95_price_css_selector=(
-            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(3) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
-        ),
-        petrol_95_location_css_selector=(
-            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(3) > p:nth-child(2)"
-        ),
-        petrol_98_price_css_selector=(
-            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(4) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
-        ),
-        petrol_98_location_css_selector=(
-            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(4) > p:nth-child(2)"
-        ),
-        diesel_price_css_selector=(
-            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
-        ),
-        diesel_location_css_selector=(
-            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(1) > p:nth-child(2)"
-        ),
-        lpg_price_css_selector=(
-            "div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > p:nth-child(2) > span:nth-child(2)"
-        ),
-        lpg_location_css_selector=("div.prices-block:nth-child(2) > div:nth-child(1) > ul:nth-child(2) > div:nth-child(6) > p:nth-child(2)"),
-    )
+    url = "https://www.virsi.lv/lv/privatpersonam/degviela/degvielas-un-elektrouzlades-cenas"
 
-    fuel_prices = __get_station_prices(station_parameters=virsi_parameters)
-    return fuel_prices
+    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+    response.raise_for_status()
+    return parse_virsi_prices(response.text)
+
+
+def parse_virsi_prices(html: str) -> list[FuelPrice]:
+    soup = BeautifulSoup(html, "html.parser")
+
+    rows = []
+    for card in soup.select(".fuel-block .price-card"):
+        price = card.select_one(".price")
+        address = card.select_one(".address")
+        if price is None:
+            continue
+        spans = price.find_all("span")
+        rows.append(
+            {
+                "fuel_type": card.get("data-type", "").lower(),
+                "price": spans[-1].get_text() if spans else "",
+                "location": address.get_text() if address else "",
+            }
+        )
+
+    return _parse_fuel_rows(
+        pd.DataFrame(rows, columns=["fuel_type", "price", "location"]),
+        station_name="Virši",
+        fuel_mapping={
+            "95e": FuelType.PETROL_95,
+            "98e": FuelType.PETROL_98,
+            "dd": FuelType.DIESEL,
+            "lpg": FuelType.LPG,
+        },
+    )
 
 
 def get_viada_prices() -> list[FuelPrice]:
-    viada_parameters = StationParameters(
+    url = "https://www.viada.lv/zemakas-degvielas-cenas/"
+
+    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+    response.raise_for_status()
+    return parse_viada_prices(response.text)
+
+
+def parse_viada_prices(html: str) -> list[FuelPrice]:
+    soup = BeautifulSoup(html, "html.parser")
+
+    rows = []
+    for row in soup.select(".fuel-table__row"):
+        fuel = row.select_one(".fuel-table__fuel")
+        price = row.select_one(".fuel-table__price")
+        if fuel is None or price is None:
+            continue
+        stations = [s.get_text() for s in row.select(".fuel-table__station")]
+        rows.append(
+            {
+                "fuel_type": fuel.get_text(),
+                "price": price.get_text(" "),
+                "location": ", ".join(s.strip() for s in stations),
+            }
+        )
+
+    return _parse_fuel_rows(
+        pd.DataFrame(rows, columns=["fuel_type", "price", "location"]),
         station_name="Viada",
-        url="https://www.viada.lv/zemakas-degvielas-cenas/",
-        petrol_95_price_css_selector=(
-            ".the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2)"
-        ),
-        petrol_95_location_css_selector=(
-            ".the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3)"
-        ),
-        petrol_98_price_css_selector=(
-            ".the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2)"
-        ),
-        petrol_98_location_css_selector=(
-            ".the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3)"
-        ),
-        diesel_price_css_selector=(
-            ".the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(5) > td:nth-child(2)"
-        ),
-        diesel_location_css_selector=(
-            ".the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(5) > td:nth-child(3)"
-        ),
-        lpg_price_css_selector=(
-            ".the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(2)"
-        ),
-        lpg_location_css_selector=(
-            ".the_content_wrapper > table:nth-child(5) > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(3)"
-        ),
+        fuel_mapping={
+            "95 Multi FX": FuelType.PETROL_95,
+            "98 Multi FX": FuelType.PETROL_98,
+            "D": FuelType.DIESEL,
+            "D Multi FX": FuelType.PRO_DIESEL,
+            "Gāze": FuelType.LPG,
+        },
     )
-
-    fuel_prices = __get_station_prices(station_parameters=viada_parameters)
-    return fuel_prices
-
-
-def __extract_fuel_price(
-    response_text: str,
-    station_name: str,
-    fuel_css_selector: str,
-    fuel_location_css_selector: str,
-    fuel_key: FuelType,
-):
-    logging.debug("Parsing " + fuel_key.value + " for " + station_name)
-    soup = BeautifulSoup(response_text, "html.parser")
-    float_regex = r"\d+(?:\.\d+)?"
-    price_string = soup.select_one(fuel_css_selector).text
-    price_float = float(re.findall(float_regex, price_string)[0])
-    location = soup.select_one(fuel_location_css_selector).text
-
-    return FuelPrice(station_name, fuel_key, price_float, location)
-
-
-def __get_station_prices(station_parameters: StationParameters) -> list[FuelPrice]:
-    fuel_prices = []
-
-    logging.info("Retrieving fuel prices for " + station_parameters.station_name)
-
-    logging.debug("Getting URL " + station_parameters.url)
-    response = requests.get(station_parameters.url)
-
-    if (
-        station_parameters.petrol_95_price_css_selector
-        and station_parameters.petrol_95_location_css_selector
-    ):
-        try:
-            logging.debug(
-                f"Retrieving {FuelType.PETROL_95} prices for {station_parameters.station_name}"
-            )
-            fuel_price = __extract_fuel_price(
-                response_text=response.text,
-                station_name=station_parameters.station_name,
-                fuel_css_selector=station_parameters.petrol_95_price_css_selector,
-                fuel_location_css_selector=station_parameters.petrol_95_location_css_selector,
-                fuel_key=FuelType.PETROL_95,
-            )
-            fuel_prices.append(fuel_price)
-        except Exception as e:
-            logging.error(
-                f"Failed to retrieve {FuelType.PETROL_95} price for {station_parameters.station_name} station"
-            )
-            logging.exception(e)
-
-    if (
-        station_parameters.petrol_98_price_css_selector
-        and station_parameters.petrol_98_location_css_selector
-    ):
-        try:
-            logging.debug(
-                f"Retrieving {FuelType.PETROL_98} prices for {station_parameters.station_name}"
-            )
-            fuel_price = __extract_fuel_price(
-                response_text=response.text,
-                station_name=station_parameters.station_name,
-                fuel_css_selector=station_parameters.petrol_98_price_css_selector,
-                fuel_location_css_selector=station_parameters.petrol_98_location_css_selector,
-                fuel_key=FuelType.PETROL_98,
-            )
-            fuel_prices.append(fuel_price)
-        except Exception as e:
-            logging.error(
-                f"Failed to retrieve {FuelType.PETROL_98} price for {station_parameters.station_name} station"
-            )
-            logging.exception(e)
-
-    if (
-        station_parameters.diesel_price_css_selector
-        and station_parameters.diesel_location_css_selector
-    ):
-        try:
-            logging.debug(
-                f"Retrieving {FuelType.DIESEL} prices for {station_parameters.station_name}"
-            )
-            fuel_price = __extract_fuel_price(
-                response_text=response.text,
-                station_name=station_parameters.station_name,
-                fuel_css_selector=station_parameters.diesel_price_css_selector,
-                fuel_location_css_selector=station_parameters.diesel_location_css_selector,
-                fuel_key=FuelType.DIESEL,
-            )
-            fuel_prices.append(fuel_price)
-        except Exception as e:
-            logging.error(
-                f"Failed to retrieve {FuelType.DIESEL} price for {station_parameters.station_name} station"
-            )
-            logging.exception(e)
-
-    if (
-        station_parameters.renewable_diesel_price_css_selector
-        and station_parameters.renewable_diesel_location_css_selector
-    ):
-        try:
-            logging.debug(
-                f"Retrieving {FuelType.RENEWABLE_DIESEL} prices for {station_parameters.station_name}"
-            )
-            fuel_price = __extract_fuel_price(
-                response_text=response.text,
-                station_name=station_parameters.station_name,
-                fuel_css_selector=station_parameters.renewable_diesel_price_css_selector,
-                fuel_location_css_selector=station_parameters.renewable_diesel_location_css_selector,
-                fuel_key=FuelType.RENEWABLE_DIESEL,
-            )
-            fuel_prices.append(fuel_price)
-        except Exception as e:
-            logging.error(
-                f"Failed to retrieve {FuelType.RENEWABLE_DIESEL} price for {station_parameters.station_name} station"
-            )
-            logging.exception(e)
-
-    if (
-        station_parameters.lpg_price_css_selector
-        and station_parameters.lpg_location_css_selector
-    ):
-        try:
-            logging.debug(
-                f"Retrieving {FuelType.LPG} prices for {station_parameters.station_name}"
-            )
-            fuel_price = __extract_fuel_price(
-                response_text=response.text,
-                station_name=station_parameters.station_name,
-                fuel_css_selector=station_parameters.lpg_price_css_selector,
-                fuel_location_css_selector=station_parameters.lpg_location_css_selector,
-                fuel_key=FuelType.LPG,
-            )
-            fuel_prices.append(fuel_price)
-        except Exception as e:
-            logging.error(
-                f"Failed to retrieve {FuelType.LPG} price for {station_parameters.station_name} station"
-            )
-            logging.exception(e)
-    return fuel_prices
