@@ -1,11 +1,14 @@
-import os
 import logging
-from fuelprices.GasStations import (
+import os
+
+from fuelprices.gas_stations import (
     get_circlek_prices,
-    get_virsi_prices,
     get_viada_prices,
+    get_virsi_prices,
 )
-from fuelprices.InfluxDb import InfluxDb
+from fuelprices.influx_db import InfluxDb
+
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -19,23 +22,20 @@ def main():
     try:
         circlek_prices = get_circlek_prices()
         influxdb.write_fuel_prices(circlek_prices)
-    except Exception as e:
-        logging.error("Failed to retrieve CircleK prices")
-        logging.exception(e)
+    except Exception:
+        logger.exception("Failed to retrieve CircleK prices")
 
     try:
         virsi_prices = get_virsi_prices()
         influxdb.write_fuel_prices(virsi_prices)
-    except Exception as e:
-        logging.error("Failed to retrieve Virsi prices")
-        logging.exception(e)
+    except Exception:
+        logger.exception("Failed to retrieve Virsi prices")
 
     try:
         viada_prices = get_viada_prices()
         influxdb.write_fuel_prices(viada_prices)
-    except Exception as e:
-        logging.error("Failed to retrieve Viada prices")
-        logging.exception(e)
+    except Exception:
+        logger.exception("Failed to retrieve Viada prices")
 
 
 if __name__ == "__main__":

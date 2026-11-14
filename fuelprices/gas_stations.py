@@ -1,12 +1,15 @@
-import requests
+import logging
 import re
 from io import StringIO
-import logging
+
 import pandas as pd
-from fuelprices.FuelPrice import FuelPrice
+import requests
 from bs4 import BeautifulSoup
 
-from fuelprices.FuelType import FuelType
+from fuelprices.fuel_price import FuelPrice
+from fuelprices.fuel_type import FuelType
+
+logger = logging.getLogger(__name__)
 
 price_regex = r"\d+(?:\.\d+)?"
 
@@ -34,13 +37,13 @@ def _parse_fuel_rows(
 
     fuel_prices = []
     for row in df.itertuples(index=False):
-        logging.debug(f"Processing row: {row.fuel_type}, {row.price}, {row.location}")
+        logger.debug(f"Processing row: {row.fuel_type}, {row.price}, {row.location}")
         if pd.isna(row.fuel_enum):
-            logging.debug(f"Skipping unknown fuel type: {row.fuel_type}")
+            logger.debug(f"Skipping unknown fuel type: {row.fuel_type}")
             continue
         prices = re.findall(price_regex, row.price.replace(",", "."))
         if not prices:
-            logging.error(
+            logger.error(
                 f"No price found for {station_name} {row.fuel_type}: {row.price!r}"
             )
             continue

@@ -1,11 +1,14 @@
 import logging
+
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
+
+logger = logging.getLogger(__name__)
 
 
 class InfluxDb:
     def __init__(self, url, token, organization, bucket):
-        logging.debug(
+        logger.debug(
             f"Configuring InfluxDB database connection for {url} organization {organization} bucket {bucket}"
         )
         self.organization = organization
@@ -17,8 +20,8 @@ class InfluxDb:
 
     def write_fuel_prices(self, fuel_prices):
         for fuel_price in fuel_prices:
-            logging.info(
-                f"Writing fuel {fuel_price.fuel_key.value} with price {str(fuel_price.price)} into InfluxDB for {fuel_price.fuel_station_name}"
+            logger.info(
+                f"Writing fuel {fuel_price.fuel_key.value} with price {fuel_price.price} into InfluxDB for {fuel_price.fuel_station_name}"
             )
             record = (
                 influxdb_client.Point(fuel_price.fuel_key.value)
