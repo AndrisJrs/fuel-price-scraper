@@ -2,7 +2,6 @@ import os
 import logging
 from fuelprices.GasStations import (
     get_circlek_prices,
-    get_neste_prices,
     get_virsi_prices,
     get_viada_prices,
 )

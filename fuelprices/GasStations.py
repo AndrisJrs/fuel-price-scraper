@@ -47,42 +47,6 @@ def get_circlek_prices() -> list[FuelPrice]:
     return fuel_prices
 
 
-def get_neste_prices() -> list[FuelPrice]:
-    station_name = "Neste"
-    url = "https://www.neste.lv/lv/content/degvielas-cenas"
-    fuel_prices = []
-
-    tables = pd.read_html(url, skiprows=1)
-
-    df = tables[0]
-    df.columns = ["fuel_type", "price", "location"]
-
-    fuel_mapping = {
-        "Neste Futura\xa095": FuelType.PETROL_95,
-        "Neste Futura 98": FuelType.PETROL_98,
-        "Neste Futura D": FuelType.DIESEL,
-        "Neste Pro Diesel": FuelType.PRO_DIESEL,
-        "Neste MY Renewable Diesel": FuelType.RENEWABLE_DIESEL
-    }
-
-    df["fuel_enum"] = df["fuel_type"].map(fuel_mapping)
-
-    for index, row in df.iterrows():
-        logging.debug(f"Processing row: {row["fuel_type"]}, {row["price"]}, {row["location"]}")
-        if pd.isna(row["fuel_enum"]):
-            logging.debug(f"Skipping unknown fuel type: {row["fuel_type"]}")
-            continue
-        fuel_price = FuelPrice(
-            fuel_station_name=station_name,
-            fuel_key=row["fuel_enum"],
-            price=float(re.findall(price_regex, str(row["price"]))[0]),
-            location=row["location"]
-        )
-        fuel_prices.append(fuel_price)
-
-    return fuel_prices
-
-
 def get_virsi_prices() -> list[FuelPrice]:
     virsi_parameters = StationParameters(
         station_name="Virši",
