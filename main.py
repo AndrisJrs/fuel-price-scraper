@@ -3,6 +3,7 @@ import os
 
 from fuelprices.gas_stations import (
     get_circlek_prices,
+    get_kool_prices,
     get_viada_prices,
     get_virsi_prices,
 )
@@ -36,6 +37,12 @@ def main():
         influxdb.write_fuel_prices(viada_prices)
     except Exception:
         logger.exception("Failed to retrieve Viada prices")
+
+    try:
+        kool_prices = get_kool_prices()
+        influxdb.write_fuel_prices(kool_prices)
+    except Exception:
+        logger.exception("Failed to retrieve Kool prices")
 
 
 if __name__ == "__main__":
