@@ -6,6 +6,7 @@ from io import StringIO
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from curl_cffi import requests as cffi_requests
 
 from fuelprices.fuel_price import FuelPrice
 from fuelprices.fuel_type import FuelType
@@ -13,6 +14,26 @@ from fuelprices.fuel_type import FuelType
 logger = logging.getLogger(__name__)
 
 price_regex = r"\d+(?:\.\d+)?"
+
+
+class BlockedError(Exception):
+    """The site answered with a bot-protection challenge instead of the page."""
+
+
+def _fetch(url: str, station_name: str, impersonate: bool = False):
+    """GET a station page, raising BlockedError on a Cloudflare challenge.
+
+    With impersonate, the request goes through curl_cffi with a Chrome TLS and
+    header fingerprint, for sites whose bot protection rejects plain requests.
+    """
+    if impersonate:
+        response = cffi_requests.get(url, impersonate="chrome", timeout=30)
+    else:
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+    if response.headers.get("cf-mitigated") == "challenge":
+        raise BlockedError(f"{station_name} blocked by Cloudflare challenge")
+    response.raise_for_status()
+    return response
 
 
 def _normalize_whitespace(text) -> str:
@@ -63,8 +84,7 @@ def _parse_fuel_rows(
 def get_circlek_prices() -> list[FuelPrice]:
     url = "https://www.circlek.lv/degviela-miles/degvielas-cenas"
 
-    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
-    response.raise_for_status()
+    response = _fetch(url, "CircleK")
     return parse_circlek_prices(response.text)
 
 
@@ -91,8 +111,8 @@ def parse_circlek_prices(html: str) -> list[FuelPrice]:
 def get_virsi_prices() -> list[FuelPrice]:
     url = "https://www.virsi.lv/lv/privatpersonam/degviela/degvielas-un-elektrouzlades-cenas"
 
-    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-    response.raise_for_status()
+    # Virši sits behind a Cloudflare challenge that rejects plain requests.
+    response = _fetch(url, "Virši", impersonate=True)
     return parse_virsi_prices(response.text)
 
 
@@ -129,8 +149,7 @@ def parse_virsi_prices(html: str) -> list[FuelPrice]:
 def get_viada_prices() -> list[FuelPrice]:
     url = "https://www.viada.lv/zemakas-degvielas-cenas/"
 
-    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-    response.raise_for_status()
+    response = _fetch(url, "Viada")
     return parse_viada_prices(response.text)
 
 
@@ -170,14 +189,10 @@ def get_kool_prices() -> list[FuelPrice]:
     # project JSON, which links a pre-rendered HTML snapshot of each page. The
     # snapshot URL changes whenever the site is republished, so look it up.
     url = "https://kool.lv/degviela/"
-    headers = {"User-Agent": "Mozilla/5.0"}
-
-    response = requests.get(url, headers=headers, timeout=30)
-    response.raise_for_status()
+    response = _fetch(url, "Kool")
     snapshot_url = _find_kool_snapshot_url(response.text, page_path="degviela")
 
-    response = requests.get(snapshot_url, headers=headers, timeout=30)
-    response.raise_for_status()
+    response = _fetch(snapshot_url, "Kool")
     # The CDN omits the charset, so requests would fall back to ISO-8859-1.
     response.encoding = "utf-8"
     return parse_kool_prices(response.text)

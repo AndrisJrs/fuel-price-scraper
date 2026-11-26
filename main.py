@@ -1,4 +1,3 @@
-import logging
 import os
 
 from fuelprices.gas_stations import (
@@ -9,8 +8,6 @@ from fuelprices.gas_stations import (
 )
 from fuelprices.influx_db import InfluxDb
 
-logger = logging.getLogger(__name__)
-
 
 def main():
     bucket = os.environ["INFLUXDB_BUCKET"]
@@ -20,29 +17,26 @@ def main():
 
     influxdb = InfluxDb(url, token, org, bucket)
 
-    try:
-        circlek_prices = get_circlek_prices()
-        influxdb.write_fuel_prices(circlek_prices)
-    except Exception:
-        logger.exception("Failed to retrieve CircleK prices")
+    scrapers = {
+        "CircleK": get_circlek_prices,
+        "Virsi": get_virsi_prices,
+        "Viada": get_viada_prices,
+        "Kool": get_kool_prices,
+    }
+    # Collect every station before failing, so one broken site doesn't stop
+    # the others from being written.
+    errors = []
+    for name, get_prices in scrapers.items():
+        try:
+            influxdb.write_fuel_prices(get_prices())
+        except Exception as e:  # noqa: BLE001 - re-raised below in the group
+            e.add_note(f"Failed to retrieve {name} prices")
+            errors.append(e)
 
-    try:
-        virsi_prices = get_virsi_prices()
-        influxdb.write_fuel_prices(virsi_prices)
-    except Exception:
-        logger.exception("Failed to retrieve Virsi prices")
-
-    try:
-        viada_prices = get_viada_prices()
-        influxdb.write_fuel_prices(viada_prices)
-    except Exception:
-        logger.exception("Failed to retrieve Viada prices")
-
-    try:
-        kool_prices = get_kool_prices()
-        influxdb.write_fuel_prices(kool_prices)
-    except Exception:
-        logger.exception("Failed to retrieve Kool prices")
+    if errors:
+        raise ExceptionGroup(
+            f"Failed to retrieve prices for {len(errors)} station(s)", errors
+        )
 
 
 if __name__ == "__main__":
